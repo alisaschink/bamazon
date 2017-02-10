@@ -41,7 +41,9 @@ connection.query('SELECT * FROM products', function (error, results, fields)
                 console.log("you are purchasing " + units + " " + results[product - 1].product_name + "s");
                 // checks if there is sufficient quantity left in stock for sale
                 if(results[product - 1].stock_quantity >= units){
+                  var total = units * (results[product - 1].price);
                   console.log("purchase approved");
+                  console.log("Your sales total today is " + total + " dollars");
                 } else{
                   console.log("Insufficient quantity! Try again.");
                 }
