@@ -24,26 +24,43 @@ connection.query('SELECT * FROM products', function (error, results, fields)
       message: "Would you like to make a purchase?"}
       ]).then(function(data){
         if (data.purchase == 'yes') {
-          // asks user what table they would like to select from
+          // asks user what produce they would like to purchase
           inquirer.prompt([
           {type: "input",
           name: "product_id",
           message: "What is the id of the product you would like to purchase?"}
           ]).then(function(data){
             var product = data.product_id;
+            //asks for quantity they would like to purchase
             inquirer.prompt([
               {type: "input",
               name: "units",
               message: "What is quantity that you would like to purchase?"}
               ]).then(function(data){
                 var units = data.units;
+                var item = results[product - 1];
+                var total = units * (item.price);
+                var newStock = item.stock_quantity - units;
                 // logs a summary of what is being purchased
-                console.log("you are purchasing " + units + " " + results[product - 1].product_name + "s");
+                console.log("you are purchasing " + units + " " + item.product_name + "s");
                 // checks if there is sufficient quantity left in stock for sale
-                if(results[product - 1].stock_quantity >= units){
-                  var total = units * (results[product - 1].price);
+                if(item.stock_quantity >= units){
+                  // updates stock quantity after sale
+                  connection.query("UPDATE products SET stock_quantity=" + newStock + " WHERE id=" + item.id, function(err, res) { 
+                    if (err) return console.log(err);
+                      console.log('update completed!')
+                  });
+
+                  // adds sale to sales table
+                  // connection.query("INSERT INTO sales (product_id, quantity_purchased VALUES (" + item.id + ", " + units + " )", function(err, res) { 
+                  //   if (err) return console.log(err);
+                  //     console.log('sale has been recorded')
+                  // });
+
+                  var total = units * (item.price);
                   console.log("purchase approved");
                   console.log("Your sales total today is " + total + " dollars");
+                  console.log("there are " + newStock + " " + item.product_name + "s left");
                 } else{
                   console.log("Insufficient quantity! Try again.");
                 }
@@ -55,6 +72,7 @@ connection.query('SELECT * FROM products', function (error, results, fields)
           
       } else{
           console.log("come back when you want to spend money");
+          connection.end();
         }
 
   });
@@ -66,7 +84,7 @@ connection.query('SELECT * FROM products', function (error, results, fields)
 
 
 
-connection.end();
+
 
 // function insertIntoTable(name, type, abv, table){
 //   connection.query("INSERT INTO " + table + " SET ?", {
