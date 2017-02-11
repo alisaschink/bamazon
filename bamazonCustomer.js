@@ -52,10 +52,10 @@ connection.query('SELECT * FROM products', function (error, results, fields)
                   });
 
                   // adds sale to sales table
-                  // connection.query("INSERT INTO sales (product_id, quantity_purchased VALUES (" + item.id + ", " + units + " )", function(err, res) { 
-                  //   if (err) return console.log(err);
-                  //     console.log('sale has been recorded')
-                  // });
+                  connection.query("INSERT INTO sales (product_id, quantity_purchased) VALUES (" + item.id + ", " + units + " )", function(err, res) { 
+                    if (err) return console.log(err);
+                      console.log('sale has been recorded')
+                  });
 
                   var total = units * (item.price);
                   console.log("purchase approved");
