@@ -110,16 +110,13 @@ function addInventory(){
         message: "What is quantity that you would like to add?"}
       ]).then(function(data){
         var units = data.units;
-        var item = results[product - 1];
-
-        // logs a summary of what is added
-        console.log((" you are adding " + units + " " + item.product_name + "s").magenta.bold);
-
-        // updates stock quantity after sale
+  
+        // updates stock quantity of product
         connection.query("UPDATE products SET stock_quantity=" + units + " WHERE id=" + product, function(err, res) { 
           if (err) return console.log(err);
+          else console.log("update complete".green.bold);
         });
-
+        // asks if user would like to update another item
         inquirer.prompt([{
           type: "input",
           name: "new_addition",
@@ -137,9 +134,9 @@ function addInventory(){
 
 
 
-//adds to inventory
+//adds new product
 function addProduct(){
-// asks user what product they would like to add to
+// asks user what product they would like to add
     inquirer.prompt([{
       type: "input",
       name: "product_name",
@@ -153,13 +150,14 @@ function addProduct(){
         message: "What is quantity that you would like to add?"}
       ]).then(function(data){
         var units = data.units;
-        var item = results[product - 1];
+        // asks for department id
         inquirer.prompt([{
           type: "input",
           name: "department",
           message: "What is the department id?"}
         ]).then(function(data){
           var department = data.department;
+          // asks for price of product
           inquirer.prompt([{
             type: "input",
             name: "price",
@@ -167,21 +165,20 @@ function addProduct(){
           ]).then(function(data){
           var price = data.price;
 
-          // logs a summary of what is added
-          console.log((" you are adding " + units + " " + item.product_name + "s").magenta.bold);
-
-         // updates stock quantity after sale
+         // updates products table
           connection.query("INSERT INTO products (product_name, department_id, price, stock_quantity) VALUES (" + product + ", " + department + ", " + price + ", " + units + ");", function(err, res) { 
             if (err) return console.log(err);
+            else console.log("update complete".green.bold);
           });
 
+          // asks user if they would like to add another product
           inquirer.prompt([{
             type: "input",
             name: "new_addition",
-            message: "Would you like to add to another product (yes/no)?".yellow.bold}
+            message: "Would you like to add another product (yes/no)?".yellow.bold}
           ]).then(function(data){
             if (data.new_purchase == 'yes') {
-              addInventory();
+              addProduct();
           } else{
             returnMenu();
           }
