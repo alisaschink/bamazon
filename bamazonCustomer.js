@@ -42,7 +42,7 @@ connection.query('SELECT * FROM products', function (error, results, fields)
   });
 
   function newPurchase(){
-    // asks user what produce they would like to purchase
+    // asks user what product they would like to purchase
     inquirer.prompt([{
       type: "input",
       name: "product_id",
