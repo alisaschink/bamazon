@@ -28,11 +28,15 @@ function mainMenu(){
         ]}
       ]).then(function(data){
         if (data.menu == "View Products for Sale") {
-          showProducts();
-          
-        // } else{
-        //   console.log("come back when you want to spend money");
-        //   connection.end();
+          showProducts(); 
+        } else if (data.menu == "View Low Inventory") {
+          viewLow();
+        } else if (data.menu == "Add To Inventory") {
+          addInventory();
+        } else if (data.menu == "Add New Product") {
+          addProduct();
+        } else if (data.menu == "Quit") { 
+          connection.end();
         }
 
   });
@@ -107,14 +111,12 @@ function addInventory(){
       ]).then(function(data){
         var units = data.units;
         var item = results[product - 1];
-        var total = units * (item.price);
-        var newStock = item.stock_quantity - units;
 
         // logs a summary of what is added
         console.log((" you are adding " + units + " " + item.product_name + "s").magenta.bold);
 
         // updates stock quantity after sale
-        connection.query("UPDATE products SET stock_quantity=" + newStock + " WHERE id=" + item.id, function(err, res) { 
+        connection.query("UPDATE products SET stock_quantity=" + units + " WHERE id=" + product, function(err, res) { 
           if (err) return console.log(err);
         });
 
@@ -137,10 +139,59 @@ function addInventory(){
 
 //adds to inventory
 function addProduct(){
-  connection.query('SELECT * FROM products', function (error, results, fields){
-    
+// asks user what product they would like to add to
+    inquirer.prompt([{
+      type: "input",
+      name: "product_name",
+      message: "What is the name of the product you would like to add?"}
+    ]).then(function(data){
+      var product = data.product_name;
+      //asks for quantity they would like to add
+      inquirer.prompt([{
+        type: "input",
+        name: "units",
+        message: "What is quantity that you would like to add?"}
+      ]).then(function(data){
+        var units = data.units;
+        var item = results[product - 1];
+        inquirer.prompt([{
+          type: "input",
+          name: "department",
+          message: "What is the department id?"}
+        ]).then(function(data){
+          var department = data.department;
+          inquirer.prompt([{
+            type: "input",
+            name: "price",
+            message: "What is the department id?"}
+          ]).then(function(data){
+          var price = data.price;
+
+          // logs a summary of what is added
+          console.log((" you are adding " + units + " " + item.product_name + "s").magenta.bold);
+
+         // updates stock quantity after sale
+          connection.query("INSERT INTO products (product_name, department_id, price, stock_quantity) VALUES (" + product + ", " + department + ", " + price + ", " + units + ");", function(err, res) { 
+            if (err) return console.log(err);
+          });
+
+          inquirer.prompt([{
+            type: "input",
+            name: "new_addition",
+            message: "Would you like to add to another product (yes/no)?".yellow.bold}
+          ]).then(function(data){
+            if (data.new_purchase == 'yes') {
+              addInventory();
+          } else{
+            returnMenu();
+          }
+          });
+        });
+      });
+    });
   });
-  returnMenu();
+};
+
 };
 
 
