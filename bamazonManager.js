@@ -7,7 +7,7 @@ var colors = require('colors');
 var connection = mysql.createConnection({
   host     : 'localhost',
   user     : 'root',
-  password : '782x2291',
+  password : '',
   database : 'bamazon_db',
 });
 

@@ -7,7 +7,7 @@ var colors = require('colors');
 var connection = mysql.createConnection({
   host     : 'localhost',
   user     : 'root',
-  password : '782x2291',
+  password : '',
   database : 'bamazon_db',
 });
 
@@ -68,7 +68,16 @@ connection.query('SELECT * FROM products', function (error, results, fields)
           // updates stock quantity after sale
           connection.query("UPDATE products SET stock_quantity=" + newStock + " WHERE id=" + item.id, function(err, res) { 
             if (err) return console.log(err);
+
           });
+
+        // if stock falls to 5 or fewer units, product gets pushed to low_inventory table
+        if (item.stock_quantity <= 5 ){
+          connection.query("INSERT INTO low_inventory (product_id, stock_quantity) VALUES (" + item.id + ", " + newStock + " )", function(err, res) { 
+            if (err) return console.log(err);
+          });
+
+        }
 
           // adds sale to sales table
           connection.query("INSERT INTO sales (product_id, quantity_purchased) VALUES (" + item.id + ", " + units + " )", function(err, res) { 
